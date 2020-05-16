@@ -21,7 +21,12 @@ const routes = [
     path: "/petitions",
     name: "petitions",
     component: Petitions
-  }
+  },
+  {
+    path: "/petitions/:petitionId",
+    name: "petition",
+    component: Petitions
+  },
 ];
 
 const router = new VueRouter({
