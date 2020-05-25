@@ -1,6 +1,8 @@
 var path = require('path')
 var webpack = require('webpack')
 
+var SRC = path.resolve(__dirname, 'src/main/js');
+
 module.exports = {
   entry: './src/main.js',
   output: {
@@ -36,6 +38,15 @@ module.exports = {
         options: {
           name: '[name].[ext]?[hash]'
         }
+      },
+      {
+        test: /\.mp3$/,
+        include: SRC,
+        loader: 'file-loader'
+      },
+      {
+        test: /\.mp3$/,
+        loader: 'url-loader'
       }
     ]
   },

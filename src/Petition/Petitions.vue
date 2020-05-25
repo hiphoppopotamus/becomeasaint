@@ -1,134 +1,87 @@
 <template>
-    <div v-if="$route.params.petitionId">
-        <log>petitionId</log>
-    </div>
-
-    <div v-else>
-        <header>
-            <br>
-            <h1>MAMABOND.com</h1>
-            <h3>The Best Porn Site ever mama bond</h3>
-        </header>
-
-
-        <div>
-            <b-input-group class="mt-3">
-                <b-form-input placeholder="Search..." id="searchBox"></b-form-input>
-                <b-input-group-append>
-                    <b-button v-on:click="searchByTitle()" variant="info">
-                        <b-icon-search></b-icon-search>
-                    </b-button>
-                </b-input-group-append>
-            </b-input-group>
-        </div>
-
-        <div class="categoryFilter">
-            <br><br>
-            <header class="card-header">
-                <h6>Categories</h6>
-            </header>
-            <br>
-            <div class="card-body">
-                <ul v-for="category in categories" class="list-menu">
-                    <li><a href="#" v-on:click="filterByCategory(category.categoryId)"> {{ category.name }} </a></li>
-                    <br>
-                </ul>
-            </div>
-        </div>
-
-        <div class="petitions-main">
-            <div class="overflow-auto">
+    <div class="background">
+        <div id="petitionsPage">
+            <WebsiteHeader/>
+            <header>
+                <h1>Join the cause, fight the power</h1>
+                <h6>Don't eat the crab dip!</h6>
                 <br>
-                <div class="petitionsHeader">
-                    <div class="pageElementCount">
+            </header>
+            <div>
+                <b-input-group class="mt-3">
+                    <b-form-input placeholder="Search..." id="searchBox"></b-form-input>
+                    <b-input-group-append>
+                        <b-button v-on:click="searchByTitle()" variant="info">
+                            <b-icon-search></b-icon-search>
+                        </b-button>
+                    </b-input-group-append>
+                </b-input-group>
+            </div>
+
+            <div class="categoryFilter">
+                <br>
+                <h4 id="categoriesH">Categories</h4>
+                <br>
+                <div class="card-body">
+                    <ul v-for="category in categories" class="list-menu">
+                        <li><a href="#" v-on:click="filterByCategory(category.categoryId)"> {{ category.name }} </a></li>
+                        <br>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="petitions-main">
+                <div class="overflow-auto">
+                    <br>
+                    <div class="petitionsHeader">
+                        <div class="pageElementCount">
                         <span class="results">
                             <span class="subset">
                                 <b> {{ startPageSum }} </b> to <b> {{ endPageSum }} </b> of
                             </span>
                             <b class="total"> {{ rows }} </b>
                         </span>
-                        <span class="results-label">Results</span>
-                    </div>
-                    <div>
+                            <span class="results-label">Results</span>
+                        </div>
+                        <b-button v-on:click="resetPetitions()" variant="info">
+                            Reload Petitions <b-icon-arrow-repeat font-scale="1"></b-icon-arrow-repeat>
+                        </b-button>
                         <b-dropdown id="dropdown-1" variant="info" text="Sort By:" class="m-md-2">
                             <b-dropdown-item v-on:click="sortBy('SIGNATURES_DESC')">Number of signatures, most to least</b-dropdown-item>
                             <b-dropdown-item v-on:click="sortBy('SIGNATURES_ASC')">Number of signatures, least to most</b-dropdown-item>
                             <b-dropdown-item v-on:click="sortBy('ALPHABETICAL_ASC')">Alphabetically by title, A-Z</b-dropdown-item>
                             <b-dropdown-item v-on:click="sortBy('ALPHABETICAL_DESC')">Alphabetically by title, Z-A</b-dropdown-item>
                         </b-dropdown>
-                        <b-button v-on:click="resetPetitions()" variant="info">
-                            Reload Petitions <b-icon-arrow-repeat font-scale="1"></b-icon-arrow-repeat>
-                        </b-button>
                     </div>
-                </div>
-                <div id="petitionsResults">
 
-                    <b-table
-                            striped hover
-                            id="my-table"
-                            :items="petitions"
-                            :fields="fields"
-                            :per-page="perPage"
-                            :current-page="currentPage"
-                            @row-clicked="getPetitionData"
-                    >
+                    <div id="petitionsResults">
+                        <b-table
+                                striped hover
+                                id="my-table"
+                                :items="petitions"
+                                :fields="fields"
+                                :per-page="perPage"
+                                :current-page="currentPage"
+                                @row-clicked="routeToOnePetition"
+                        >
+                            <template v-slot:cell(image)="data">
+                                <span v-html="data.value"></span>
+                            </template>
+                        </b-table>
 
+                        <b-pagination
+                                v-model="currentPage"
+                                :total-rows="rows"
+                                :per-page="perPage"
+                                aria-controls="my-table"
+                        ></b-pagination>
 
-<!--                        <span slot="id" slot-scope="data">-->
-<!--                            <router-link :to="-->
-<!--                                        {-->
-<!--                                            name: 'user',-->
-<!--                                          params: { userId : user.user_id }-->
-<!--                                         }">-->
-<!--                                <b-button>{{ data.value.description }}</b-button>-->
-<!--                            </router-link>-->
-<!--                        </span>-->
-
-                        <template v-slot:cell(image)="data">
-                            <span v-html="data.value"></span>
-                        </template>
-
-                    </b-table>
-
-                    <b-pagination
-                            v-model="currentPage"
-                            :total-rows="rows"
-                            :per-page="perPage"
-                            aria-controls="my-table"
-                    ></b-pagination>
-
+                    </div>
                 </div>
             </div>
         </div>
-
-
-
-<!--        <div>-->
-<!--            <b-card-group deck v-for="petition in petitions">-->
-
-<!--                <b-card-->
-<!--                        no-body-->
-<!--                        style="max-width: 20rem;"-->
-<!--                        img-src=`{{petition.image}}`-->
-<!--                        img-alt="Image"-->
-<!--                        img-top-->
-<!--                >-->
-<!--                    <template v-slot:header>-->
-<!--                        <h4 class="mb-0"> {{ petition.title }} </h4>-->
-<!--                    </template>-->
-
-<!--                    <b-card-body>-->
-<!--                        <b-card-title> {{ petition.category }} </b-card-title>-->
-<!--                        <b-card-sub-title class="mb-2"> {{ petition.authorName }} </b-card-sub-title>-->
-<!--                        <b-card-text>-->
-<!--                            {{ petition.signatureCount }} Signatures-->
-<!--                        </b-card-text>-->
-<!--                    </b-card-body>-->
-<!--                </b-card>-->
-<!--            </b-card-group>-->
-<!--        </div>-->
-
-
+        <br>
+        <br>
     </div>
 </template>
 
@@ -149,7 +102,7 @@
                 sortFilter: "",
                 titleFilterClicked: false,
                 categoryFilterClicked: false,
-                sortFilterClicked: false
+                sortFilterClicked: false,
             }
         },
         mounted: function() {
@@ -221,8 +174,6 @@
                 this.petitions = Array.from(this.originalPetitions);
             },
 
-
-
             searchByTitle: function() {
                 let titleFilter = document.getElementById("searchBox").value;
                 let query;
@@ -283,8 +234,6 @@
                     });
             },
 
-
-
             filterByCategory: function(categoryId) {
                 let query;
                 if (this.titleFilterClicked && this.sortFilterClicked) {
@@ -343,8 +292,6 @@
                         this.errorFlag = true;
                     });
             },
-
-
 
             sortBy: function(sortFilter) {
                 let query;
@@ -405,14 +352,18 @@
                     });
             },
 
-            getPetitionData: function(record) {
-                this.$router.push({ name: 'petition', params: { petitionId: record.id }})
+            routeToOnePetition: function(record) {
+                this.$router.push({ name: 'petition', params: { petitionId: record.id }});
             }
         }
     }
 </script>
 
 <style scoped>
+    header {
+        text-align: center;
+    }
+
     body {
         background-color: #eeeeee;
         font-family: 'Open Sans', serif;
@@ -420,27 +371,18 @@
     }
 
     .categoryFilter {
-        border-bottom: 1px solid #e4e4e4;
         float: left;
-        width: 15%;
+        width: 20%;
         height: 100%;
     }
 
+    #categoriesH {
+        padding-left: 10%;
+        padding-top: 20%;
+    }
+
     .card-header {
-        padding: 0.75rem 1.25rem;
-        margin-bottom: 0;
-        background-color: #fff;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1)
-    }
-
-    .categoryFilter .card-header {
-        border-bottom: 0
-    }
-
-    .icon-control {
-        margin-top: 6px;
-        float: right;
-        font-size: 80%
+        padding-bottom: 6%;
     }
 
     .list-menu {
@@ -468,5 +410,30 @@
         border-color: #3167eb;
         background-color: #3167eb;
         color: #fff
+    }
+
+    #petitionsPage {
+        margin: 5% 8%;
+    }
+
+    .background {
+        font-family: Futura,sans-serif;
+        background-color: floralwhite;
+    }
+
+    button {
+        width: 170px;
+    }
+
+    #dropdown-1 {
+        border-radius: 16px;
+    }
+
+    .petitionsHeader {
+        display:inline-block;
+        /*overflow: auto;*/
+        white-space: nowrap;
+        width: 50%;
+        margin:0px auto;
     }
 </style>
